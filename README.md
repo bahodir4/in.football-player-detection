@@ -2,6 +2,10 @@
 
 A computer vision pipeline that detects and tracks players, referees, and the ball in football match footage, assigns players to teams by jersey color, and tracks ball possession throughout the video.
 
+## Demo
+
+<video src="data/output/08fd33_4_output.mp4" controls width="100%"></video>
+
 ## What it does
 
 - Detects players, goalkeepers, referees, and the ball using a fine-tuned YOLO model
