@@ -65,6 +65,7 @@ Tracking results are cached to `stubs/track_stubs.pkl` on the first run. Subsequ
 - Base architecture: YOLOv5x — 151 layers, 97.2M parameters, 246 GFLOPs
 - Inference library: [Ultralytics](https://github.com/ultralytics/ultralytics) (`ultralytics==8.4.72`)
 - Training: 100 epochs, ~2 hours on Tesla T4 (Google Colab), 612 train / 38 val images
+- Download weights: [best.pt — Google Drive](https://drive.google.com/file/d/1vrJbNv1xRtnlAkU6L8aadKYewpFgr4l_/view?usp=share_link)
 
 ### Validation results (best.pt)
 
