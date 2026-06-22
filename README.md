@@ -62,8 +62,21 @@ Tracking results are cached to `stubs/track_stubs.pkl` on the first run. Subsequ
 `models/best.pt` is a YOLOv5x model fine-tuned on a football player dataset from Roboflow Universe. The dataset contains annotated classes for `player`, `goalkeeper`, `referee`, and `ball`.
 
 - Dataset: [Football Player Detection — Roboflow Universe](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc)
-- Base architecture: YOLOv5x
+- Base architecture: YOLOv5x — 151 layers, 97.2M parameters, 246 GFLOPs
 - Inference library: [Ultralytics](https://github.com/ultralytics/ultralytics) (`ultralytics==8.4.72`)
+- Training: 100 epochs, ~2 hours on Tesla T4 (Google Colab), 612 train / 38 val images
+
+### Validation results (best.pt)
+
+| Class | Precision | Recall | mAP@50 | mAP@50-95 |
+|---|---|---|---|---|
+| **all** | 0.882 | 0.829 | 0.845 | 0.586 |
+| ball | 0.776 | 0.486 | 0.465 | 0.201 |
+| goalkeeper | 0.891 | 0.909 | 0.977 | 0.734 |
+| player | 0.967 | 0.983 | 0.985 | 0.764 |
+| referee | 0.893 | 0.940 | 0.952 | 0.643 |
+
+Inference speed: **16.7 ms/image** on T4 GPU. Ball detection scores are lower due to the small number of annotated ball instances (35) and its small size in-frame.
 
 ## Dependencies
 
