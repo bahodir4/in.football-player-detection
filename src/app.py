@@ -2,6 +2,7 @@ from utils import read_video, save_video
 from trackers import Tracker
 from team_assigner import TeamAssigner
 from player_ball_assigner import PlayerBallAssigner
+from camera_movement_estimator import CameraMovementEstimator
 import numpy as np
 import cv2
 
@@ -15,6 +16,15 @@ def main():
                                        read_from_stub=True,
                                        stub_path='stubs/track_stubs.pkl')
     
+    tracker.add_position_to_tracks(tracks)
+    
+    camera_movement_estimator = CameraMovementEstimator(video_frames[0])
+    camera_movement_per_frame = camera_movement_estimator.get_camera_movement(video_frames,
+                                                                              read_from_stub=True,
+                                                                              stub_path="stubs/camera_movement.pkl")
+    
+    camera_movement_estimator.adjust_position_to_tracks(tracks, camera_movement_per_frame)
+       
     tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
     
     team_assigner = TeamAssigner()
@@ -39,19 +49,12 @@ def main():
             tracks['players'][frame_num][assigned_player]['has_ball'] = True
             team_ball_control.append(tracks['players'][frame_num][assigned_player]['team'])
         else:
-            team_ball_control.append(team_ball_control[-1])
+            team_ball_control.append(team_ball_control[-1] if team_ball_control else 0)
     team_ball_control= np.array(team_ball_control)
-            
-    # for track_id, player in tracks['player'][0].items():
-    #     bbox = player['bbox']
-    #     frame = frames[0]
-        
-    #     cropped_player = frame[int(bbox[1]):int(bbox[3]), int(bbox[0]):int(bbox[2])]
-        
-    #     cv2.imwrite(f"data/output/player_{track_id}.jpg", cropped_player)
-    #     break
     
     output_video_frames = tracker.draw_annotations(video_frames, tracks,team_ball_control)
+    
+    output_video_frames = camera_movement_estimator.draw_camera_movement(output_video_frames, camera_movement_per_frame)
     
     save_video(output_video_frames, "data/output/08fd33_4_output.mp4")
     

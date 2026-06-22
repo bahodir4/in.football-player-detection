@@ -1,6 +1,6 @@
 # Football Player Detection & Analysis
 
-A computer vision pipeline that detects and tracks players, referees, and the ball in football match footage, assigns players to teams by jersey color, and tracks ball possession throughout the video.
+A computer vision pipeline that detects and tracks players, referees, and the ball in football match footage, assigns players to teams by jersey color, compensates for camera movement, and tracks ball possession throughout the video.
 
 ## Demo
 
@@ -8,12 +8,13 @@ A computer vision pipeline that detects and tracks players, referees, and the ba
 
 ## What it does
 
-- Detects players, goalkeepers, referees, and the ball using a fine-tuned YOLO model
+- Detects players, goalkeepers, referees, and the ball using a fine-tuned YOLOv5x model
 - Tracks every object across frames with ByteTrack, keeping consistent IDs
+- Estimates camera movement per frame using Lucas-Kanade optical flow and adjusts all tracked positions accordingly
 - Separates players into two teams using K-Means clustering on jersey colors
 - Determines which player has the ball each frame and calculates team ball-control percentages
 - Interpolates missing ball positions to smooth out detection gaps
-- Annotates and exports the final video with ellipses, player IDs, ball triangles, and a ball-control overlay
+- Annotates and exports the final video with ellipses, player IDs, ball triangles, camera movement overlay, and ball-control stats
 
 ## Project structure
 
@@ -27,12 +28,13 @@ A computer vision pipeline that detects and tracks players, referees, and the ba
 ├── notebooks/
 │   └── color_assignment.ipynb
 ├── src/
-│   ├── app.py                          # main entry point
-│   ├── trackers/tracker.py             # detection + tracking + annotation
-│   ├── team_assigner/team_assigner.py  # jersey-color team clustering
-│   ├── player_ball_assigner/           # ball possession assignment
-│   └── utils/                          # bbox helpers, video I/O
-├── stubs/                              # cached track pkl files
+│   ├── app.py                                        # main entry point
+│   ├── trackers/tracker.py                           # detection + tracking + annotation
+│   ├── camera_movement_estimator/                    # optical flow camera compensation
+│   ├── team_assigner/team_assigner.py                # jersey-color team clustering
+│   ├── player_ball_assigner/                         # ball possession assignment
+│   └── utils/                                        # bbox helpers, video I/O
+├── stubs/                              # cached track and camera movement pkl files
 └── requirements.txt
 ```
 
@@ -55,7 +57,7 @@ cd src
 python app.py
 ```
 
-Tracking results are cached to `stubs/track_stubs.pkl` on the first run. Subsequent runs load from the stub instantly — delete the file to re-run detection.
+Tracking and camera movement results are cached to `stubs/` on the first run. Subsequent runs load from the stubs instantly — delete the pkl files to re-run from scratch.
 
 ## Model
 
