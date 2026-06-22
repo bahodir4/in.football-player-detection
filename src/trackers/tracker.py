@@ -1,5 +1,6 @@
 from ultralytics import YOLO
 import supervision as sv
+import numpy as np
 import pickle
 import cv2
 import sys
@@ -77,7 +78,7 @@ class Tracker:
                 
         return tracks
     
-    def draw_ellipse(self, frame, bbox, color, track_id):
+    def draw_ellipse(self, frame, bbox, color, track_id=None):
         y2 = int(bbox[3])
         x_center, _ = get_center_of_bbox(bbox)
         width = get_width_of_bbox(bbox)
@@ -87,12 +88,53 @@ class Tracker:
             center=(x_center, y2),
             axes=(int(width),int(0.35*width)),
             angle=0.0,
-            startAngle=45,
+            startAngle=-45,
             endAngle=235,
             color=color,
             thickness=2,
             lineType=cv2.LINE_4
         )
+        
+        rectangle_width = 40
+        rectangle_height = 20
+        x1_rect = x_center - rectangle_width // 2
+        x2_rect = x_center + rectangle_width // 2
+        y1_rect = (y2 - rectangle_height // 2) + 15
+        y2_rect = (y2 + rectangle_height // 2) + 15
+        
+        if track_id is not None:
+            cv2.rectangle(frame, 
+                          (x1_rect, y1_rect), 
+                          (x2_rect, y2_rect), 
+                          color, 
+                          cv2.FILLED)
+            x1_text = x1_rect+12
+            if track_id > 99:
+                x1_text-=10
+            
+            cv2.putText(frame,
+                        text=str(track_id),
+                        org=(x1_text, y1_rect+15),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=0.6,
+                        color=(0, 0, 0),
+                        thickness=2)
+
+        return frame
+        
+    def draw_triangle(self, frame, bbox, color):
+        y = int(bbox[1])
+        x, _  = get_center_of_bbox(bbox)
+        
+        triangle_points = np.array([
+            [x,y],
+            [x-10, y-20],
+            [x+10, y-20],
+        ]
+        ) 
+        cv2.drawContours(frame, [triangle_points], 0, color, cv2.FILLED)
+        cv2.drawContours(frame, [triangle_points], 0, (0,0,0), 2)
+        
         return frame
         
     def draw_annotations(self, frames, tracks):
@@ -107,6 +149,12 @@ class Tracker:
             for track_id, player in player_dict.items():
                 frame = self.draw_ellipse(frame, player['bbox'], (0, 0, 255), track_id)
                 
+            for _, referee in referee_dict.items():
+                frame = self.draw_ellipse(frame, referee['bbox'], (0, 255, 255), track_id)
+                
+            for _, ball in ball_dict.items():
+                frame = self.draw_triangle(frame, ball['bbox'], (0, 255, 0))
+
             output_frames.append(frame)
         
         return output_frames
