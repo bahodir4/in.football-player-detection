@@ -12,10 +12,11 @@ A computer vision pipeline that detects and tracks players, referees, and the ba
 - Tracks every object across frames with ByteTrack, keeping consistent IDs
 - Estimates camera movement per frame using Lucas-Kanade optical flow and adjusts all tracked positions accordingly
 - Transforms pixel positions to real-world pitch coordinates (meters) using perspective transform
+- Estimates player speed (km/h) and total distance covered (m) from the transformed positions
 - Separates players into two teams using K-Means clustering on jersey colors
 - Determines which player has the ball each frame and calculates team ball-control percentages
 - Interpolates missing ball positions to smooth out detection gaps
-- Annotates and exports the final video with ellipses, player IDs, ball triangles, camera movement overlay, and ball-control stats
+- Annotates and exports the final video with ellipses, player IDs, speed/distance labels, ball triangles, camera movement overlay, and ball-control stats
 
 ## Project structure
 
@@ -33,6 +34,7 @@ A computer vision pipeline that detects and tracks players, referees, and the ba
 │   ├── trackers/                       # detection, ByteTrack tracking, annotation
 │   ├── camera_movement_estimator/      # Lucas-Kanade optical flow camera compensation
 │   ├── view_transformer/               # perspective transform to real-world pitch coords
+│   ├── speed_and_distance_estimator/   # per-player speed (km/h) and distance (m)
 │   ├── team_assigner/                  # K-Means jersey-color team clustering
 │   ├── player_ball_assigner/           # ball possession assignment per frame
 │   └── utils/                          # bbox helpers, video I/O
