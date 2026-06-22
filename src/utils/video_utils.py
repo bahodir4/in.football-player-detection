@@ -4,22 +4,17 @@ import os
 def read_video(video_path):
     cap = cv2.VideoCapture(video_path)
     frames = []
-    
     while True:
         ret, frame = cap.read()
         if not ret:
             break
         frames.append(frame)
-    
-    cap.release()
     return frames
 
-def save_video(frames, output_path):
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+def save_video(ouput_video_frames, output_video_path):
+    os.makedirs(os.path.dirname(os.path.abspath(output_video_path)), exist_ok=True)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, 20.0, (frames[0].shape[1], frames[0].shape[0]))
-    
-    for frame in frames:
+    out = cv2.VideoWriter(output_video_path, fourcc, 24, (ouput_video_frames[0].shape[1], ouput_video_frames[0].shape[0]))
+    for frame in ouput_video_frames:
         out.write(frame)
-    
     out.release()
